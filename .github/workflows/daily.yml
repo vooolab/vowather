@@ -1,42 +1,40 @@
-name: Hourly Update (No-Push Version)
+name: Hourly Job
 
 on:
   schedule:
-    - cron: "0 * * * *"
-  workflow_dispatch:
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+    - cron: "0 * * * *"   # Her saat başı (UTC)
+  workflow_dispatch:      # Manuel tetikleme opsiyonu
 
 jobs:
-  build-and-deploy:
+  run:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+    steps:  
+      # 1️⃣ Repo’yu çek  
+      - name: Checkout repository  
+        uses: actions/checkout@v4  
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+      # 2️⃣ Python kurulumu  
+      - name: Setup Python  
+        uses: actions/setup-python@v5  
+        with:  
+          python-version: "3.11"  
 
-      - name: Run Script
-        run: python main.py
+      # 3️⃣ Gereksinimleri kur  
+      - name: Install dependencies  
+        run: pip install -r requirements.txt  
 
-      # İŞTE BURASI FARKLI: Git'e push yapmıyoruz! 
-      # Oluşan dosyaları "yayınlanacak paket" olarak ayarlıyoruz.
-      - name: Upload Pages Artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: './www' # HTML dosyalarının olduğu klasör
+      # 4️⃣ Python scriptini çalıştır  
+      - name: Run main.py  
+        run: python main.py  
 
-      # Paketi direkt internete (GitHub Pages) fırlatıyoruz
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-        
+      # 5️⃣ www/ klasörünü commit ve push et  
+      - name: Commit and push www/  
+        uses: ad-m/github-push-action@v0.6.0  
+        with:  
+          github_token: ${{ secrets.PAT_TOKEN }}  
+          branch: main  
+          directory: www  
+          force: true
+          commit_message: "Otomatik güncelleme - saatlik"
+          
