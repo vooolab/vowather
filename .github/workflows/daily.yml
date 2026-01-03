@@ -27,8 +27,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - run: |
+      - name: Commit ve push
+        run: |
           git add www/
-          git commit -m "Otomatik hava durumu güncellemesi" || echo "Commit yok"
+          git commit -m "Otomatik güncelleme" || echo "Commit yok"
+          git push origin main
+
 
       - run: git push
