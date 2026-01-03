@@ -1,76 +1,42 @@
-name: Hourly Job
+name: Hourly Update (No-Push Version)
 
 on:
   schedule:
-    - cron: "0 * * * *"   # Her saat başı (UTC)
-  workflow_dispatch:      # Manuel çalıştırma butonu
+    - cron: "0 * * * *"
+  workflow_dispatch:
 
 permissions:
-  contents: write         # GitHub'a dosya yazabilmek için bu şart
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
-  run:
+  build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
-      # 1. Dosyaları GitHub'dan çek
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Tüm geçmişi çek ki çakışmaları çözebilsin
 
-      # 2. Python'ı kur
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      # 3. Kütüphaneleri yükle
       - name: Install dependencies
-        run: |
-          pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        run: pip install -r requirements.txt
 
-      # 4. Senin scriptini çalıştır (HTML'leri üreten kısım)
-      - name: Run main.py
+      - name: Run Script
         run: python main.py
 
-      # 5. GÜNCELLEME VE PUSH (Hatasız ve Döngülü Versiyon)
-      - name: Commit and push changes
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+      # İŞTE BURASI FARKLI: Git'e push yapmıyoruz! 
+      # Oluşan dosyaları "yayınlanacak paket" olarak ayarlıyoruz.
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './www' # HTML dosyalarının olduğu klasör
 
-          # www klasöründeki yeni dosyaları listeye ekle
-          git add www/
-
-          # Eğer hiçbir şey değişmemişse işlemi bitir (Hata verme)
-          if git diff --cached --quiet; then
-            echo "Değişiklik yok, push edilmiyor."
-            exit 0
-          fi
-
-          # Değişiklikleri paketle
-          git commit -m "Saatlik otomatik güncelleme [skip ci]"
-
-          # Çakışmaları aşmak için 5 deneme yapıyoruz
-          SUCCESS=false
-          for i in {1..5}; do
-            echo "Deneme $i: Güncel halini çekip üstüne ekliyorum (Rebase)..."
-            
-            # Sunucudaki son değişikliği al ve bizimkini onun üzerine koy
-            if git pull --rebase origin main && git push origin main; then
-              echo "BAŞARILI: Dosyalar güncellendi."
-              SUCCESS=true
-              break
-            fi
-            
-            echo "Çakışma oldu, 5 saniye bekleyip tekrar deniyorum..."
-            sleep 5
-          done
-
-          if [ "$SUCCESS" = false ]; then
-            echo "HATA: 5 deneme de başarısız oldu."
-            exit 1
-          fi
-          
+      # Paketi direkt internete (GitHub Pages) fırlatıyoruz
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        
