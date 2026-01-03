@@ -1,43 +1,39 @@
-name: Daily Job
+name: Hourly Job
 
-# Her gün belirli saatlerde çalışacak (UTC)
+# Her saat başı çalışacak (UTC)
 on:
   schedule:
-    - cron: "0 8 * * *"   # 08:00 UTC
-    - cron: "0 12 * * *"  # 12:00 UTC
-    - cron: "0 14 * * *"  # 14:00 UTC
-    - cron: "0 16 * * *"  # 16:00 UTC
-    - cron: "0 20 * * *"  # 20:00 UTC
-  workflow_dispatch:        # manuel tetikleme opsiyonu
+    - cron: "0 * * * *"   # Her saat başı UTC
+  workflow_dispatch:       # Manuel tetikleme opsiyonu
 
 jobs:
   run:
     runs-on: ubuntu-latest
 
     steps:
-      # Repo’yu çek
+      # 1️⃣ Repo’yu çek
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Python kurulumu
+      # 2️⃣ Python kurulumu
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      # Gereksinimleri kur
+      # 3️⃣ Gereksinimleri kur
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      # Python scriptini çalıştır
+      # 4️⃣ Python scriptini çalıştır
       - name: Run main.py
         run: python main.py
 
-      # Commit ve push işlemi
+      # 5️⃣ www/ klasörünü commit ve push et
       - name: Commit and push www/
         uses: ad-m/github-push-action@v0.6.0
         with:
           github_token: ${{ secrets.PAT_TOKEN }}
           branch: main
           directory: www
-          commit_message: "Otomatik güncelleme"
+          commit_message: "Otomatik güncelleme - saatlik"
