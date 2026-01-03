@@ -1,0 +1,185 @@
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saatlik Hava Durumu</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .buttons {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: inline-flex;
+            z-index: 1000;
+        }
+        .back-link {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 12px 20px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            margin: 0 5px;
+        }
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-5px);
+        }
+        .container {
+            max-width: 1400px;
+            margin: 80px auto 20px;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            text-align: center;
+            min-width: 150px;
+            margin: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .stat-card h3 {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        .stat-card p {
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        th {
+            padding: 18px;
+            text-align: left;
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.9em;
+        }
+        td {
+            padding: 16px 18px;
+            border-bottom: 1px solid #ecf0f1;
+            color: #2c3e50;
+        }
+        tbody tr { transition: all 0.3s ease; }
+        tbody tr:hover {
+            background: #f8f9fa;
+            transform: scale(1.01);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        tbody tr:last-child td { border-bottom: none; }
+        @media (max-width: 768px) {
+            .container { padding: 20px; margin-top: 60px; }
+            h1 { font-size: 1.8em; }
+            th, td { padding: 10px; font-size: 0.9em; }
+            .stats { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="buttons">
+        <a href="../haftalik.html" class="back-link">← Haftalık</a>
+        <a href="ruzgar_rapor.html" class="back-link">Rüzgar Detayları</a>
+    </div>
+    
+    <div class="container">
+        <h1>⏰ Saatlik Hava Durumu</h1>
+        <p class="subtitle">Detaylı Saatlik Tahmin - 2 Veri Noktası</p>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <h3>📊 Toplam Veri</h3>
+                <p>2</p>
+            </div>
+            <div class="stat-card">
+                <h3>🕐 İlk Saat</h3>
+                <p>22:00</p>
+            </div>
+            <div class="stat-card">
+                <h3>🕐 Son Saat</h3>
+                <p>23:00</p>
+            </div>
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th style="text-align:center;">🕐 Saat</th>
+                    <th>☁️ Hava Durumu</th>
+                    <th style="text-align:center;">🌡️ Sıcaklık</th>
+                    <th style="text-align:center;">🤒 Hissedilen</th>
+                    <th style="text-align:center;">🧭 Yön</th>
+                    <th style="text-align:center;">💨 Hız</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+        <tr>
+            <td style="text-align:center;">22:00</td>
+            <td>Sağanak yağışlı</td>
+            <td style="text-align:center;">14°C</td>
+            <td style="text-align:center;">13°C</td>
+            <td style="text-align:center;">Güney</td>
+            <td style="text-align:center;">26 km/h</td>
+        </tr>
+        
+        <tr>
+            <td style="text-align:center;">23:00</td>
+            <td>Sağanak yağışlı</td>
+            <td style="text-align:center;">14°C</td>
+            <td style="text-align:center;">12°C</td>
+            <td style="text-align:center;">Güney</td>
+            <td style="text-align:center;">23 km/h</td>
+        </tr>
+        
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
+    

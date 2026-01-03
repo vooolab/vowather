@@ -1,0 +1,130 @@
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bursa - 7 Günlük Hava Durumu</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+        .info-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 1.1em;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        th {
+            padding: 18px;
+            text-align: left;
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.9em;
+        }
+        td {
+            padding: 16px 18px;
+            border-bottom: 1px solid #ecf0f1;
+            color: #2c3e50;
+        }
+        tbody tr { transition: all 0.3s ease; }
+        tbody tr:hover {
+            background: #f8f9fa;
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        tbody tr:last-child td { border-bottom: none; }
+        td a {
+            color: #2c3e50;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: block;
+        }
+        td a:hover {
+            color: #667eea;
+            transform: translateX(5px);
+        }
+        .badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            margin-left: 5px;
+        }
+        @media (max-width: 768px) {
+            .container { padding: 20px; }
+            h1 { font-size: 1.8em; }
+            th, td { padding: 10px; font-size: 0.9em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌤️ Bursa - Hava Durumu</h1>
+        <p class="subtitle">7 Günlük Detaylı Tahmin</p>
+        
+        <div class="info-box">
+            💡 <strong>Tarih</strong> üzerine tıklayarak saatlik detaylara ulaşabilirsiniz
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>📅 Tarih</th>
+                    <th>☁️ Hava Durumu</th>
+                    <th style="text-align:center;">💧 Yağış</th>
+                    <th style="text-align:center;">🌞 Gündüz</th>
+                    <th style="text-align:center;">🌙 Gece</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><a href="./0/saatlik.html" style="color: #2c3e50; text-decoration: none; font-weight: 600;">Bu gece 📊</a></td><td>Çok bulutlu</td><td style='text-align:center;'>%56</td><td style='text-align:center;'>~</td><td style='text-align:center;'>9°</td></tr><tr><td><a href="./1/saatlik.html" style="color: #2c3e50; text-decoration: none; font-weight: 600;">Yarın 📊</a></td><td>Parçalı bulutlu</td><td style='text-align:center;'>%5</td><td style='text-align:center;'>13°</td><td style='text-align:center;'>9°</td></tr><tr><td>5 Oca Pzt</td><td>Çok bulutlu</td><td style='text-align:center;'>%0</td><td style='text-align:center;'>13°</td><td style='text-align:center;'>9°</td></tr><tr><td>6 Oca Sal</td><td>Parçalı bulutlu</td><td style='text-align:center;'>%5</td><td style='text-align:center;'>15°</td><td style='text-align:center;'>11°</td></tr><tr><td>7 Oca Çar</td><td>Parçalı bulutlu ve yağmur ihtimali</td><td style='text-align:center;'>%50</td><td style='text-align:center;'>17°</td><td style='text-align:center;'>13°</td></tr><tr><td>8 Oca Per</td><td>Şiddetli yağış sonrası bulutlu</td><td style='text-align:center;'>%56</td><td style='text-align:center;'>19°</td><td style='text-align:center;'>10°</td></tr><tr><td>9 Oca Cum</td><td>Hafif yağmur veya karla karışık yağmur</td><td style='text-align:center;'>%47</td><td style='text-align:center;'>9°</td><td style='text-align:center;'>2°</td></tr><tr><td>10 Oca Cmt</td><td>Yağmur ve hava bulutlu</td><td style='text-align:center;'>%56</td><td style='text-align:center;'>8°</td><td style='text-align:center;'>2°</td></tr><tr><td>11 Oca Paz</td><td>Hafif kar yağışı ve Karla kaplanma</td><td style='text-align:center;'>%47</td><td style='text-align:center;'>8°</td><td style='text-align:center;'>1°</td></tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
+    
