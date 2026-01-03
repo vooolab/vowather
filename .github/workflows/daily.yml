@@ -2,7 +2,7 @@ name: Daily Job
 
 on:
   schedule:
-    - cron: "0 5 * * *"   # her gün 08:00 TR (UTC+3)
+    - cron: "0 5 * * *"
   workflow_dispatch:
 
 jobs:
@@ -10,36 +10,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Repo'yu çek
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Python kur
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Bağımlılıkları kur
-        run: |
-          pip install -r requirements.txt
+      - run: pip install -r requirements.txt
 
-      - name: Script çalıştır
-        run: |
-          python main.py
-          
-      - name: Git ayarları
-        run: |
+      - run: python main.py
+
+      - run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Değişiklik var mı kontrol et
-        run: |
-          git status
-
-      - name: Değişiklikleri commit et
-        run: |
+      - run: |
           git add www/
           git commit -m "Otomatik hava durumu güncellemesi" || echo "Commit yok"
 
-      - name: Push et
-        run: |
-          git push
+      - run: git push
