@@ -17,7 +17,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # rebase için zorunlu
+          fetch-depth: 0
 
       # 2️⃣ Python kurulumu
       - name: Setup Python
@@ -35,35 +35,44 @@ jobs:
       - name: Run main.py
         run: python main.py
 
-      # 5️⃣ Commit + rebase + push (STABİL)
+      # 5️⃣ Commit + REBASE + PUSH (RACE CONDITION SAFE)
       - name: Commit and push www/
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Güvenlik: cache çöplerini asla commit etme
+          # Çöp dosyalar kesin dışarı
           git reset --hard
           git clean -fd
 
-          # Remote'u güncelle
-          git fetch origin
-          git rebase origin/main || {
-            echo "Rebase conflict çıktı, işlem iptal"
-            git rebase --abort
-            exit 0
-          }
-
-          echo "=== GIT STATUS ==="
-          git status
-
-          # Sadece www/ ile ilgilen
           git add www/
 
-          # Gerçek değişiklik yoksa çık
           if git diff --cached --quiet; then
-            echo "Değişiklik yok, commit atlanıyor"
+            echo "Değişiklik yok, çıkılıyor"
             exit 0
           fi
 
           git commit -m "Saatlik otomatik güncelleme"
-          git push origin main
+
+          # 🔁 Retry loop (en kritik kısım)
+          for i in 1 2 3 4 5; do
+            echo "Push denemesi #$i"
+
+            git fetch origin
+            git rebase origin/main || {
+              echo "Rebase conflict, abort"
+              git rebase --abort
+              exit 1
+            }
+
+            if git push origin main; then
+              echo "Push başarılı"
+              exit 0
+            fi
+
+            echo "Push başarısız, tekrar deneniyor..."
+            sleep 3
+          done
+
+          echo "5 denemede push başarısız oldu"
+          exit 1
