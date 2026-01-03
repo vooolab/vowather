@@ -1,10 +1,14 @@
 name: Daily Job
 
-# Her gün saat 08:00'de çalışacak (UTC+0), Türkiye saatiyle 11:00
+# Her gün belirli saatlerde çalışacak (UTC)
 on:
   schedule:
-    - cron: "0 8 * * *"
-  workflow_dispatch:
+    - cron: "0 8 * * *"   # 08:00 UTC
+    - cron: "0 12 * * *"  # 12:00 UTC
+    - cron: "0 14 * * *"  # 14:00 UTC
+    - cron: "0 16 * * *"  # 16:00 UTC
+    - cron: "0 20 * * *"  # 20:00 UTC
+  workflow_dispatch:        # manuel tetikleme opsiyonu
 
 jobs:
   run:
@@ -12,21 +16,25 @@ jobs:
 
     steps:
       # Repo’yu çek
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      # Python kur
-      - uses: actions/setup-python@v5
+      # Python kurulumu
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
       # Gereksinimleri kur
-      - run: pip install -r requirements.txt
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
       # Python scriptini çalıştır
-      - run: python main.py
+      - name: Run main.py
+        run: python main.py
 
-      # Commit ve push işlemi (ad-m/github-push-action kullanıyoruz)
-      - name: Commit ve push www/
+      # Commit ve push işlemi
+      - name: Commit and push www/
         uses: ad-m/github-push-action@v0.6.0
         with:
           github_token: ${{ secrets.PAT_TOKEN }}
