@@ -1,112 +1,76 @@
-name: Hourly Content Updater
+name: Hourly Job
 
 on:
   schedule:
-    - cron: "0 * * * *"   # Her saat başı
-  workflow_dispatch:      # Manuel tetikleme için
+    - cron: "0 * * * *"   # Her saat başı (UTC)
+  workflow_dispatch:      # Manuel çalıştırma butonu
 
 permissions:
-  contents: write         # Yazma izni şart
+  contents: write         # GitHub'a dosya yazabilmek için bu şart
 
 jobs:
-  update-and-push:
+  run:
     runs-on: ubuntu-latest
-    
+
     steps:
-      # 1. Repo'yu çek (fetch-depth: 0 rebase için kritik)
-      - name: Checkout Repository
+      # 1. Dosyaları GitHub'dan çek
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # Tüm geçmişi çek ki çakışmaları çözebilsin
 
-      # 2. Python Ortamı
+      # 2. Python'ı kur
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-          cache: 'pip' # Bağımlılıkları önbelleğe alarak hızlandırır
 
-      # 3. Bağımlılıklar
-      - name: Install Dependencies
+      # 3. Kütüphaneleri yükle
+      - name: Install dependencies
         run: |
-          pip install -r requirements.txt
+          pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      # 4. Scripti Çalıştır (Dosyalar burada üretiliyor)
+      # 4. Senin scriptini çalıştır (HTML'leri üreten kısım)
       - name: Run main.py
         run: python main.py
 
-      # 5. Akıllı Commit ve Push (Hata payı bırakmayan yöntem)
-      - name: Smart Sync & Push
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          # Sadece www klasöründeki değişiklikleri hedef alıyoruz
-          git add www/
-
-          # Değişiklik yoksa boşuna işlem yapma
-          if git diff --cached --quiet; then
-            echo "Güncellenecek bir veri bulunamadı."
-            exit 0
-          fi
-
-          git commit -m "Automated Update: $(date -u +'%Y-%m-%d %H:%M') UTC [skip ci]"
-
-          # Çakışma (Race Condition) önleyici döngü
-          SUCCESS=false
-          for i in {1..5}; do
-            echo "Push denemesi $i..."
-            
-            # Rebase yaparak uzak sunucudaki güncel hali kendi commit'inin altına alır
-            if git pull --rebase origin main && git push origin main; then
-              echo "Veriler başarıyla gönderildi!"
-              SUCCESS=true
-              break
-            fi
-            
-            echo "Hata oluştu, 10 saniye sonra tekrar deneniyor..."
-            sleep 10
-          done
-
-          if [ "$SUCCESS" = false ]; then
-            echo "5 deneme sonunda başarısız olundu."
-            exit 1
-          fi
-
-      # 5️⃣ Commit + REBASE + PUSH (RACE CONDITION SAFE)
+      # 5. GÜNCELLEME VE PUSH (Hatasız ve Döngülü Versiyon)
       - name: Commit and push changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # 1. Önce taze dosyaları ekle
+          # www klasöründeki yeni dosyaları listeye ekle
           git add www/
 
-          # 2. Değişiklik var mı kontrol et
+          # Eğer hiçbir şey değişmemişse işlemi bitir (Hata verme)
           if git diff --cached --quiet; then
-            echo "Değişiklik yok, işlem yapılmıyor."
+            echo "Değişiklik yok, push edilmiyor."
             exit 0
           fi
 
-          # 3. Değişiklikleri yerel bir commit'e al
+          # Değişiklikleri paketle
           git commit -m "Saatlik otomatik güncelleme [skip ci]"
 
-          # 4. Döngü içinde Rebase ve Push (Çakışmaları önlemek için)
-          MAX_RETRIES=5
-          for i in $(seq 1 $MAX_RETRIES); do
-            echo "Deneme $i/$MAX_RETRIES..."
+          # Çakışmaları aşmak için 5 deneme yapıyoruz
+          SUCCESS=false
+          for i in {1..5}; do
+            echo "Deneme $i: Güncel halini çekip üstüne ekliyorum (Rebase)..."
             
-            # Uzak sunucudaki son durumu çek ve kendi commit'ini onun üzerine taşı
-            git pull --rebase origin main
-
-            if git push origin main; then
-              echo "Başarıyla push edildi!"
-              exit 0
+            # Sunucudaki son değişikliği al ve bizimkini onun üzerine koy
+            if git pull --rebase origin main && git push origin main; then
+              echo "BAŞARILI: Dosyalar güncellendi."
+              SUCCESS=true
+              break
             fi
-
-            echo "Push başarısız, birileri senden önce davrandı. 5 saniye sonra tekrar denenecek..."
+            
+            echo "Çakışma oldu, 5 saniye bekleyip tekrar deniyorum..."
             sleep 5
           done
 
-          echo "Hata: $MAX_RETRIES denemeye rağmen push yapılamadı."
-          exit 1
+          if [ "$SUCCESS" = false ]; then
+            echo "HATA: 5 deneme de başarısız oldu."
+            exit 1
+          fi
+          
