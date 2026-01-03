@@ -17,15 +17,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # rebase için şart
+          fetch-depth: 0   # rebase için zorunlu
 
-      # 2️⃣ Python kur
+      # 2️⃣ Python kurulumu
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      # 3️⃣ Gereksinimleri yükle
+      # 3️⃣ Bağımlılıkları yükle
       - name: Install dependencies
         run: |
           pip install --upgrade pip
@@ -35,30 +35,35 @@ jobs:
       - name: Run main.py
         run: python main.py
 
-      # 5️⃣ Commit + rebase + push (ÇAKIŞMA KORUMALI)
+      # 5️⃣ Commit + rebase + push (STABİL)
       - name: Commit and push www/
         run: |
-          set -e
-
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          echo "=== REMOTE GÜNCEL DURUM ALINIYOR ==="
-          git fetch origin
+          # Güvenlik: cache çöplerini asla commit etme
+          git reset --hard
+          git clean -fd
 
-          echo "=== REBASE BAŞLIYOR ==="
+          # Remote'u güncelle
+          git fetch origin
           git rebase origin/main || {
-            echo "Rebase conflict çıktı, işlem durduruldu"
+            echo "Rebase conflict çıktı, işlem iptal"
             git rebase --abort
-            exit 1
+            exit 0
           }
 
           echo "=== GIT STATUS ==="
           git status
 
+          # Sadece www/ ile ilgilen
           git add www/
 
-          git commit -m "Saatlik otomatik güncelleme" || echo "Değişiklik yok, commit atlanıyor"
+          # Gerçek değişiklik yoksa çık
+          if git diff --cached --quiet; then
+            echo "Değişiklik yok, commit atlanıyor"
+            exit 0
+          fi
 
-          echo "=== PUSH EDİLİYOR ==="
+          git commit -m "Saatlik otomatik güncelleme"
           git push origin main
