@@ -25,3 +25,21 @@ jobs:
       - name: Script çalıştır
         run: |
           python main.py
+          
+      - name: Git ayarları
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Değişiklik var mı kontrol et
+        run: |
+          git status
+
+      - name: Değişiklikleri commit et
+        run: |
+          git add www/
+          git commit -m "Otomatik hava durumu güncellemesi" || echo "Commit yok"
+
+      - name: Push et
+        run: |
+          git push
