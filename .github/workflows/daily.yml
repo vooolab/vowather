@@ -1,8 +1,9 @@
 name: Daily Job
 
+# Her gün saat 08:00'de çalışacak (UTC+0), Türkiye saatiyle 11:00
 on:
   schedule:
-    - cron: "0 5 * * *"
+    - cron: "0 8 * * *"
   workflow_dispatch:
 
 jobs:
@@ -10,28 +11,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Repo’yu çek
       - uses: actions/checkout@v4
-        with:
-          ref: main
-          persist-credentials: true
 
+      # Python kur
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
+      # Gereksinimleri kur
       - run: pip install -r requirements.txt
 
+      # Python scriptini çalıştır
       - run: python main.py
 
-      - run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Commit ve push
-        run: |
-          git add www/
-          git commit -m "Otomatik güncelleme" || echo "Commit yok"
-          git push origin main
-
-
-      - run: git push
+      # Commit ve push işlemi (ad-m/github-push-action kullanıyoruz)
+      - name: Commit ve push www/
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
+          directory: www
+          commit_message: "Otomatik güncelleme"
