@@ -36,43 +36,39 @@ jobs:
         run: python main.py
 
       # 5️⃣ Commit + REBASE + PUSH (RACE CONDITION SAFE)
-      - name: Commit and push www/
+      - name: Commit and push changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Çöp dosyalar kesin dışarı
-          git reset --hard
-          git clean -fd
-
+          # 1. Önce taze dosyaları ekle
           git add www/
 
+          # 2. Değişiklik var mı kontrol et
           if git diff --cached --quiet; then
-            echo "Değişiklik yok, çıkılıyor"
+            echo "Değişiklik yok, işlem yapılmıyor."
             exit 0
           fi
 
-          git commit -m "Saatlik otomatik güncelleme"
+          # 3. Değişiklikleri yerel bir commit'e al
+          git commit -m "Saatlik otomatik güncelleme [skip ci]"
 
-          # 🔁 Retry loop (en kritik kısım)
-          for i in 1 2 3 4 5; do
-            echo "Push denemesi #$i"
-
-            git fetch origin
-            git rebase origin/main || {
-              echo "Rebase conflict, abort"
-              git rebase --abort
-              exit 1
-            }
+          # 4. Döngü içinde Rebase ve Push (Çakışmaları önlemek için)
+          MAX_RETRIES=5
+          for i in $(seq 1 $MAX_RETRIES); do
+            echo "Deneme $i/$MAX_RETRIES..."
+            
+            # Uzak sunucudaki son durumu çek ve kendi commit'ini onun üzerine taşı
+            git pull --rebase origin main
 
             if git push origin main; then
-              echo "Push başarılı"
+              echo "Başarıyla push edildi!"
               exit 0
             fi
 
-            echo "Push başarısız, tekrar deneniyor..."
-            sleep 3
+            echo "Push başarısız, birileri senden önce davrandı. 5 saniye sonra tekrar denenecek..."
+            sleep 5
           done
 
-          echo "5 denemede push başarısız oldu"
+          echo "Hata: $MAX_RETRIES denemeye rağmen push yapılamadı."
           exit 1
